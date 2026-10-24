@@ -1,5 +1,5 @@
 
-package ir.mehdi.supplyflow.catalog.dto;
+package ir.mehdi.supplyflow.catalog.dto.category;
 
 import lombok.Getter;
 import lombok.Setter;

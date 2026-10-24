@@ -1,4 +1,4 @@
-package ir.mehdi.supplyflow.catalog.dto;
+package ir.mehdi.supplyflow.catalog.dto.product;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class AddProductDTO {
+public class UpdateProductDTO {
 
     @NotBlank
     private String name;

@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import ir.mehdi.supplyflow.catalog.exception.CategoryNotFoundException;
 import ir.mehdi.supplyflow.catalog.mapper.CategoryMapper;
-import ir.mehdi.supplyflow.catalog.dto.ViewCategoryDTO;
-import ir.mehdi.supplyflow.catalog.dto.AddCategoryDTO;
-import ir.mehdi.supplyflow.catalog.dto.UpdateCategoryDTO;
+import ir.mehdi.supplyflow.catalog.dto.category.ViewCategoryDTO;
+import ir.mehdi.supplyflow.catalog.dto.category.AddCategoryDTO;
+import ir.mehdi.supplyflow.catalog.dto.category.UpdateCategoryDTO;
 
 @Service
 @RequiredArgsConstructor

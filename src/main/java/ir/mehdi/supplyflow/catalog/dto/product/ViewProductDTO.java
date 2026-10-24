@@ -1,4 +1,4 @@
-package ir.mehdi.supplyflow.catalog.dto;
+package ir.mehdi.supplyflow.catalog.dto.product;
 
 import ir.mehdi.supplyflow.catalog.enums.ProductStatus;
 import lombok.Getter;

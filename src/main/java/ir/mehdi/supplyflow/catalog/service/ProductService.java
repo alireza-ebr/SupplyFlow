@@ -1,8 +1,8 @@
 package ir.mehdi.supplyflow.catalog.service;
 
-import ir.mehdi.supplyflow.catalog.dto.AddProductDTO;
-import ir.mehdi.supplyflow.catalog.dto.UpdateProductDTO;
-import ir.mehdi.supplyflow.catalog.dto.ViewProductDTO;
+import ir.mehdi.supplyflow.catalog.dto.product.AddProductDTO;
+import ir.mehdi.supplyflow.catalog.dto.product.UpdateProductDTO;
+import ir.mehdi.supplyflow.catalog.dto.product.ViewProductDTO;
 import ir.mehdi.supplyflow.catalog.entity.Category;
 import ir.mehdi.supplyflow.catalog.entity.Product;
 import ir.mehdi.supplyflow.catalog.exception.CategoryNotFoundException;
