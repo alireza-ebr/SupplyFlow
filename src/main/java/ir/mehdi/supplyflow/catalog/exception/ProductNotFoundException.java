@@ -1,8 +1,13 @@
 package ir.mehdi.supplyflow.catalog.exception;
 
-public class ProductNotFoundException extends RuntimeException {
+import ir.mehdi.supplyflow.exception.ResourceNotFoundException;
+
+public class ProductNotFoundException extends ResourceNotFoundException {
 
     public ProductNotFoundException(Long id) {
-        super("Product not found with id: " + id);
+        super(
+                "PRODUCT_NOT_FOUND",
+                "Product not found with id: " + id
+        );
     }
 }
