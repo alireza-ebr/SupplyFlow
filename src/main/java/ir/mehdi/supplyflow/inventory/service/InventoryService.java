@@ -3,17 +3,14 @@ package ir.mehdi.supplyflow.inventory.service;
 import ir.mehdi.supplyflow.catalog.entity.Product;
 import ir.mehdi.supplyflow.catalog.exception.ProductNotFoundException;
 import ir.mehdi.supplyflow.catalog.repository.ProductRepository;
-import ir.mehdi.supplyflow.inventory.dto.AddInventoryDTO;
-import ir.mehdi.supplyflow.inventory.dto.UpdateInventoryDTO;
-import ir.mehdi.supplyflow.inventory.dto.ViewInventoryDTO;
+import ir.mehdi.supplyflow.inventory.dto.ChangeQuantityDTO;
 import ir.mehdi.supplyflow.inventory.entity.Inventory;
-import ir.mehdi.supplyflow.inventory.exception.InventoryNotFoundException;
-import ir.mehdi.supplyflow.inventory.mapper.InventoryMapper;
+import ir.mehdi.supplyflow.inventory.enums.InventoryType;
+import ir.mehdi.supplyflow.inventory.exception.InsufficientStockException;
 import ir.mehdi.supplyflow.inventory.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,50 +18,39 @@ public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
-    private final InventoryMapper inventoryMapper;
 
-    public ViewInventoryDTO save(AddInventoryDTO dto) {
-        Product product = productRepository.findById(dto.getProductId())
-                .orElseThrow(() ->
+    @Transactional
+    public Inventory changeQuantity(ChangeQuantityDTO dto) {
+
+        Product product = productRepository.findById(dto.getProductId()).orElseThrow(() ->
                         new ProductNotFoundException(dto.getProductId()));
 
-        Inventory inventory = inventoryMapper.toEntity(dto);
-        inventory.setProduct(product);
+        Inventory inventory = inventoryRepository.findByProduct_Id(dto.getProductId()).orElseGet(() -> {
+                    if (dto.getType() == InventoryType.DECREASE) {
+                        throw new InsufficientStockException(0, dto.getQuantity());
+                    }
 
-        Inventory savedInventory = inventoryRepository.save(inventory);
+                    Inventory newInventory = new Inventory();
+                    newInventory.setProduct(product);
+                    newInventory.setQuantityAvailable(0);
+                    return newInventory;
+                });
 
-        return inventoryMapper.toViewDTO(savedInventory);
-    }
+        int currentQuantity = inventory.getQuantityAvailable();
 
-    public List<ViewInventoryDTO> findAll() {
-        return inventoryRepository.findAll()
-                .stream()
-                .map(inventoryMapper::toViewDTO)
-                .toList();
-    }
+        if (dto.getType() == InventoryType.INCREASE) {
 
-    public Inventory findById(Long id) {
-        return inventoryRepository.findById(id)
-                .orElseThrow(() -> new InventoryNotFoundException(id));
-    }
+            inventory.setQuantityAvailable(currentQuantity + dto.getQuantity());
 
-    public ViewInventoryDTO viewById(Long id) {
-        Inventory inventory = findById(id);
-        return inventoryMapper.toViewDTO(inventory);
-    }
+        } else if (dto.getType() == InventoryType.DECREASE) {
 
-    public ViewInventoryDTO update(Long id, UpdateInventoryDTO dto) {
-        Inventory inventory = findById(id);
+            if (dto.getQuantity() > currentQuantity) {
+                throw new InsufficientStockException(currentQuantity, dto.getQuantity());
+            }
 
-        inventoryMapper.updateEntity(inventory, dto);
+            inventory.setQuantityAvailable(currentQuantity - dto.getQuantity());
+        }
 
-        Inventory updatedInventory = inventoryRepository.save(inventory);
-
-        return inventoryMapper.toViewDTO(updatedInventory);
-    }
-
-    public void deleteById(Long id) {
-        findById(id);
-        inventoryRepository.deleteById(id);
+        return inventoryRepository.save(inventory);
     }
 }
