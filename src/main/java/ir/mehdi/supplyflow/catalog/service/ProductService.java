@@ -12,6 +12,8 @@ import ir.mehdi.supplyflow.catalog.repository.CategoryRepository;
 import ir.mehdi.supplyflow.catalog.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ir.mehdi.supplyflow.inventory.service.InventoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,24 +24,22 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
+    private final InventoryService inventoryService;
 
     public ViewProductDTO save(AddProductDTO dto) {
-        Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() ->
+        Category category = categoryRepository.findById(dto.getCategoryId()).orElseThrow(() ->
                         new CategoryNotFoundException(dto.getCategoryId()));
 
         Product product = productMapper.toEntity(dto);
         product.setCategory(category);
-
         Product savedProduct = productRepository.save(product);
-
+        inventoryService.createInventory(savedProduct);
         return productMapper.toViewDTO(savedProduct);
     }
 
     public List<ViewProductDTO> findAll() {
         return productRepository.findAll().stream()
-                .map(productMapper::toViewDTO)
-                .toList();
+                .map(productMapper::toViewDTO).toList();
     }
 
     public Product findById(Long id) {
@@ -66,8 +66,10 @@ public class ProductService {
         return productMapper.toViewDTO(updatedProduct);
     }
 
+    @Transactional
     public void deleteById(Long id) {
         findById(id);
+        inventoryService.deleteByProductId(id);
         productRepository.deleteById(id);
     }
 }

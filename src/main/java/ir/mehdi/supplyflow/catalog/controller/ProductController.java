@@ -20,8 +20,7 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ViewProductDTO> save(
-            @Valid @RequestBody AddProductDTO dto) {
+    public ResponseEntity<ViewProductDTO> save(@Valid @RequestBody AddProductDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(productService.save(dto));
     }

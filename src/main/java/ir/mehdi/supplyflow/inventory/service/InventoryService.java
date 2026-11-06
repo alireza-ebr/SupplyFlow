@@ -53,4 +53,23 @@ public class InventoryService {
 
         return inventoryRepository.save(inventory);
     }
+
+    public Inventory createInventory(Product product) {
+
+        Inventory inventory = new Inventory();
+
+        inventory.setProduct(product);
+        inventory.setQuantityAvailable(0);
+
+        return inventoryRepository.save(inventory);
+    }
+
+    public void deleteByProductId(Long productId) {
+
+        Inventory inventory = inventoryRepository.findByProduct_Id(productId).orElse(null);
+
+        if (inventory != null) {
+            inventoryRepository.delete(inventory);
+        }
+    }
 }
