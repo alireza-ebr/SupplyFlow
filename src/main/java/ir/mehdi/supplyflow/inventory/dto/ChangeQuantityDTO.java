@@ -18,6 +18,5 @@ public class ChangeQuantityDTO {
     private InventoryType type;
 
     @NotNull
-    @Positive
     private Integer quantity;
 }

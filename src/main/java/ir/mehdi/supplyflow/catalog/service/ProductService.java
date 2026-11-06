@@ -10,9 +10,9 @@ import ir.mehdi.supplyflow.catalog.exception.ProductNotFoundException;
 import ir.mehdi.supplyflow.catalog.mapper.ProductMapper;
 import ir.mehdi.supplyflow.catalog.repository.CategoryRepository;
 import ir.mehdi.supplyflow.catalog.repository.ProductRepository;
+import ir.mehdi.supplyflow.inventory.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ir.mehdi.supplyflow.inventory.service.InventoryService;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -26,9 +26,10 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final InventoryService inventoryService;
 
+    @Transactional
     public ViewProductDTO save(AddProductDTO dto) {
         Category category = categoryRepository.findById(dto.getCategoryId()).orElseThrow(() ->
-                        new CategoryNotFoundException(dto.getCategoryId()));
+                new CategoryNotFoundException(dto.getCategoryId()));
 
         Product product = productMapper.toEntity(dto);
         product.setCategory(category);

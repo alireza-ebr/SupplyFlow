@@ -10,6 +10,9 @@ import ir.mehdi.supplyflow.inventory.exception.InsufficientStockException;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import ir.mehdi.supplyflow.inventory.exception.InvalidInventoryQuantityException;
+import ir.mehdi.supplyflow.inventory.exception.InventoryQuantityOverflowException;
+import ir.mehdi.supplyflow.inventory.exception.InventoryAlreadyExistsException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -44,6 +47,60 @@ public class GlobalExceptionHandler {
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
         body.put("errorCode", "INSUFFICIENT_STOCK");
+        body.put("message", ex.getMessage());
+        body.put("path", request.getRequestURI());
+
+        return ResponseEntity.status(status).body(body);
+    }
+
+    @ExceptionHandler(InvalidInventoryQuantityException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidInventoryQuantity(
+            InvalidInventoryQuantityException ex,
+            HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("errorCode", "INVALID_INVENTORY_QUANTITY");
+        body.put("message", ex.getMessage());
+        body.put("path", request.getRequestURI());
+
+        return ResponseEntity.status(status).body(body);
+    }
+
+    @ExceptionHandler(InventoryQuantityOverflowException.class)
+    public ResponseEntity<Map<String, Object>> handleInventoryQuantityOverflow(
+            InventoryQuantityOverflowException ex,
+            HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("errorCode", "INVENTORY_QUANTITY_OVERFLOW");
+        body.put("message", ex.getMessage());
+        body.put("path", request.getRequestURI());
+
+        return ResponseEntity.status(status).body(body);
+    }
+
+    @ExceptionHandler(InventoryAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleInventoryAlreadyExists(
+            InventoryAlreadyExistsException ex,
+            HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("errorCode", "INVENTORY_ALREADY_EXISTS");
         body.put("message", ex.getMessage());
         body.put("path", request.getRequestURI());
 
