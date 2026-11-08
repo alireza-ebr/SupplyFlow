@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ir.mehdi.supplyflow.inventory.dto.InventoryTransactionDTO;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/inventory")
@@ -19,5 +21,15 @@ public class InventoryController {
     public ResponseEntity<Inventory> changeQuantity(@Valid @RequestBody ChangeQuantityDTO dto) {
         Inventory inventory = inventoryService.changeQuantity(dto);
         return ResponseEntity.ok(inventory);
+    }
+
+    @GetMapping("/{productId}/history")
+    public ResponseEntity<List<InventoryTransactionDTO>> getInventoryHistory(
+            @PathVariable Long productId) {
+
+        List<InventoryTransactionDTO> history =
+                inventoryService.getInventoryHistory(productId);
+
+        return ResponseEntity.ok(history);
     }
 }

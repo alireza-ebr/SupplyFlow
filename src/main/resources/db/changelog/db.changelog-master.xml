@@ -7,5 +7,6 @@
     <include file="category-changelog.xml" relativeToChangelogFile="true"/>
     <include file="product-changelog.xml" relativeToChangelogFile="true"/>
     <include file="inventory-changelog.xml" relativeToChangelogFile="true"/>
+    <include file="inventory-transaction-changelog.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
