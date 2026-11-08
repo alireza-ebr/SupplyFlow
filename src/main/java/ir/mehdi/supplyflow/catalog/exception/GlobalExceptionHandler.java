@@ -1,6 +1,9 @@
 package ir.mehdi.supplyflow.catalog.exception;
 
 import ir.mehdi.supplyflow.exception.ResourceNotFoundException;
+import ir.mehdi.supplyflow.exception.ErrorMessage;
+import ir.mehdi.supplyflow.inventory.exception.InvalidInventoryQuantityException;
+import ir.mehdi.supplyflow.inventory.exception.InventoryAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +13,7 @@ import ir.mehdi.supplyflow.inventory.exception.InsufficientStockException;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import ir.mehdi.supplyflow.inventory.exception.InvalidInventoryQuantityException;
 import ir.mehdi.supplyflow.inventory.exception.InventoryQuantityOverflowException;
-import ir.mehdi.supplyflow.inventory.exception.InventoryAlreadyExistsException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -46,10 +47,9 @@ public class GlobalExceptionHandler {
         body.put("timestamp", Instant.now());
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
-        body.put("errorCode", "INSUFFICIENT_STOCK");
         body.put("message", ex.getMessage());
+        body.put("errorCode", ErrorMessage.INSUFFICIENT_STOCK_CODE);
         body.put("path", request.getRequestURI());
-
         return ResponseEntity.status(status).body(body);
     }
 
@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
         body.put("timestamp", Instant.now());
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
-        body.put("errorCode", "INVALID_INVENTORY_QUANTITY");
+        body.put("errorCode", ErrorMessage.INVALID_INVENTORY_QUANTITY_CODE);
         body.put("message", ex.getMessage());
         body.put("path", request.getRequestURI());
 
@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
         body.put("timestamp", Instant.now());
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
-        body.put("errorCode", "INVENTORY_QUANTITY_OVERFLOW");
+        body.put("errorCode", ErrorMessage.INVENTORY_QUANTITY_OVERFLOW_CODE);
         body.put("message", ex.getMessage());
         body.put("path", request.getRequestURI());
 
@@ -100,7 +100,7 @@ public class GlobalExceptionHandler {
         body.put("timestamp", Instant.now());
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
-        body.put("errorCode", "INVENTORY_ALREADY_EXISTS");
+        body.put("errorCode", ErrorMessage.INVENTORY_ALREADY_EXISTS_CODE);
         body.put("message", ex.getMessage());
         body.put("path", request.getRequestURI());
 
