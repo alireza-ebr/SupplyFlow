@@ -24,12 +24,8 @@ public class InventoryController {
     }
 
     @GetMapping("/{productId}/history")
-    public ResponseEntity<List<InventoryTransactionDTO>> getInventoryHistory(
-            @PathVariable Long productId) {
-
-        List<InventoryTransactionDTO> history =
-                inventoryService.getInventoryHistory(productId);
-
+    public ResponseEntity<List<InventoryTransactionDTO>> getInventoryHistory(@PathVariable Long productId) {
+        List<InventoryTransactionDTO> history = inventoryService.getInventoryHistory(productId);
         return ResponseEntity.ok(history);
     }
 }

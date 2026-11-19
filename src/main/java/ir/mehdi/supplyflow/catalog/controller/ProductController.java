@@ -4,6 +4,8 @@ import ir.mehdi.supplyflow.catalog.dto.product.AddProductDTO;
 import ir.mehdi.supplyflow.catalog.dto.product.UpdateProductDTO;
 import ir.mehdi.supplyflow.catalog.dto.product.ViewProductDTO;
 import ir.mehdi.supplyflow.catalog.service.ProductService;
+import ir.mehdi.supplyflow.catalog.service.ProductApplicationService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,11 +20,12 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductApplicationService productApplicationService;
 
     @PostMapping
     public ResponseEntity<ViewProductDTO> save(@Valid @RequestBody AddProductDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(productService.save(dto));
+                .body(productApplicationService.save(dto));
     }
 
     @GetMapping
@@ -45,7 +48,7 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        productService.deleteById(id);
+        productApplicationService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

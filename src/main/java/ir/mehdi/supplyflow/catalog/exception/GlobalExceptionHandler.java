@@ -14,6 +14,9 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import ir.mehdi.supplyflow.inventory.exception.InventoryQuantityOverflowException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.stream.Collectors;
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -23,17 +26,13 @@ public class GlobalExceptionHandler {
             ResourceNotFoundException ex,
             HttpServletRequest request) {
 
-        HttpStatus status = HttpStatus.NOT_FOUND;
-
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", Instant.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("errorCode", ex.getErrorCode());
-        body.put("message", ex.getMessage());
-        body.put("path", request.getRequestURI());
-
-        return ResponseEntity.status(status).body(body);
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                ex.getErrorCode(),
+                ex.getMessage(),
+                request
+        );
     }
 
     @ExceptionHandler(InsufficientStockException.class)
@@ -41,16 +40,13 @@ public class GlobalExceptionHandler {
             InsufficientStockException ex,
             HttpServletRequest request) {
 
-        HttpStatus status = HttpStatus.CONFLICT;
-
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", Instant.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("message", ex.getMessage());
-        body.put("errorCode", ErrorMessage.INSUFFICIENT_STOCK_CODE);
-        body.put("path", request.getRequestURI());
-        return ResponseEntity.status(status).body(body);
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                HttpStatus.CONFLICT.getReasonPhrase(),
+                ErrorMessage.INSUFFICIENT_STOCK_CODE,
+                ex.getMessage(),
+                request
+        );
     }
 
     @ExceptionHandler(InvalidInventoryQuantityException.class)
@@ -58,17 +54,13 @@ public class GlobalExceptionHandler {
             InvalidInventoryQuantityException ex,
             HttpServletRequest request) {
 
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", Instant.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("errorCode", ErrorMessage.INVALID_INVENTORY_QUANTITY_CODE);
-        body.put("message", ex.getMessage());
-        body.put("path", request.getRequestURI());
-
-        return ResponseEntity.status(status).body(body);
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ErrorMessage.INVALID_INVENTORY_QUANTITY_CODE,
+                ex.getMessage(),
+                request
+        );
     }
 
     @ExceptionHandler(InventoryQuantityOverflowException.class)
@@ -76,17 +68,13 @@ public class GlobalExceptionHandler {
             InventoryQuantityOverflowException ex,
             HttpServletRequest request) {
 
-        HttpStatus status = HttpStatus.CONFLICT;
-
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", Instant.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("errorCode", ErrorMessage.INVENTORY_QUANTITY_OVERFLOW_CODE);
-        body.put("message", ex.getMessage());
-        body.put("path", request.getRequestURI());
-
-        return ResponseEntity.status(status).body(body);
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                HttpStatus.CONFLICT.getReasonPhrase(),
+                ErrorMessage.INVENTORY_QUANTITY_OVERFLOW_CODE,
+                ex.getMessage(),
+                request
+        );
     }
 
     @ExceptionHandler(InventoryAlreadyExistsException.class)
@@ -94,14 +82,53 @@ public class GlobalExceptionHandler {
             InventoryAlreadyExistsException ex,
             HttpServletRequest request) {
 
-        HttpStatus status = HttpStatus.CONFLICT;
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                HttpStatus.CONFLICT.getReasonPhrase(),
+                ErrorMessage.INVENTORY_ALREADY_EXISTS_CODE,
+                ex.getMessage(),
+                request
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationError(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request) {
+
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getDefaultMessage())
+                .collect(Collectors.joining("، "));
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "درخواست نامعتبر است");
+        body.put("message", message);
+        body.put("path", request.getRequestURI());
+
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    private ResponseEntity<Map<String, Object>> buildErrorResponse(
+            HttpStatus status,
+            String error,
+            String errorCode,
+            String message,
+            HttpServletRequest request) {
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", Instant.now());
         body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("errorCode", ErrorMessage.INVENTORY_ALREADY_EXISTS_CODE);
-        body.put("message", ex.getMessage());
+        body.put("error", error);
+
+        if (errorCode != null) {
+            body.put("errorCode", errorCode);
+        }
+
+        body.put("message", message);
         body.put("path", request.getRequestURI());
 
         return ResponseEntity.status(status).body(body);

@@ -17,6 +17,7 @@ public class ChangeQuantityDTO {
     @NotNull
     private InventoryType type;
 
-    @NotNull
+    @NotNull(message = "تعداد نباید خالی باشد")
+    @Positive(message = "تعداد باید بیشتر از صفر باشد")
     private Integer quantity;
 }

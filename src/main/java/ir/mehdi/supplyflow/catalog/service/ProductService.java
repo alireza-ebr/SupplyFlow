@@ -5,15 +5,14 @@ import ir.mehdi.supplyflow.catalog.dto.product.UpdateProductDTO;
 import ir.mehdi.supplyflow.catalog.dto.product.ViewProductDTO;
 import ir.mehdi.supplyflow.catalog.entity.Category;
 import ir.mehdi.supplyflow.catalog.entity.Product;
-import ir.mehdi.supplyflow.catalog.exception.CategoryNotFoundException;
 import ir.mehdi.supplyflow.catalog.exception.ProductNotFoundException;
 import ir.mehdi.supplyflow.catalog.mapper.ProductMapper;
-import ir.mehdi.supplyflow.catalog.repository.CategoryRepository;
 import ir.mehdi.supplyflow.catalog.repository.ProductRepository;
-import ir.mehdi.supplyflow.inventory.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ir.mehdi.supplyflow.catalog.service.CategoryService;
+
 
 import java.util.List;
 
@@ -22,19 +21,17 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     private final ProductMapper productMapper;
-    private final InventoryService inventoryService;
 
     @Transactional
     public ViewProductDTO save(AddProductDTO dto) {
-        Category category = categoryRepository.findById(dto.getCategoryId()).orElseThrow(() ->
-                new CategoryNotFoundException(dto.getCategoryId()));
+        Long categoryId=dto.getCategoryId();
+        Category category = categoryService.findById(categoryId);
 
         Product product = productMapper.toEntity(dto);
         product.setCategory(category);
         Product savedProduct = productRepository.save(product);
-        inventoryService.createInventory(savedProduct);
         return productMapper.toViewDTO(savedProduct);
     }
 
@@ -44,8 +41,7 @@ public class ProductService {
     }
 
     public Product findById(Long id) {
-        return productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException(id));
+        return productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
     }
 
     public ViewProductDTO viewById(Long id) {
@@ -56,8 +52,7 @@ public class ProductService {
     public ViewProductDTO update(Long id, UpdateProductDTO dto) {
         Product product = findById(id);
 
-        Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new CategoryNotFoundException(dto.getCategoryId()));
+        Category category = categoryService.findById(dto.getCategoryId());
 
         productMapper.updateEntity(product, dto);
         product.setCategory(category);
@@ -70,7 +65,6 @@ public class ProductService {
     @Transactional
     public void deleteById(Long id) {
         findById(id);
-        inventoryService.deleteByProductId(id);
         productRepository.deleteById(id);
     }
 }
