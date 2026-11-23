@@ -18,7 +18,7 @@ public interface ErrorMessage {
     String INVALID_INVENTORY_QUANTITY = "Inventory quantity must be greater than zero. Given: %d";
     String INVENTORY_QUANTITY_OVERFLOW = "Inventory quantity exceeds the maximum allowed value.";
     String INVENTORY_ALREADY_EXISTS = "Inventory already exists for product ID: %d";
-    String INVENTORY_NOT_FOUND = "Inventory not found for product ID: %d";
+    String INVENTORY_NOT_FOUND = "Inventory entity not found for product ID: %d";
 
     // Catalog error messages
     String PRODUCT_NOT_FOUND = "Product not found with id: %d";
